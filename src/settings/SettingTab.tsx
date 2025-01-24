@@ -123,14 +123,12 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
 
   renderLanguageSection(containerEl: HTMLElement): void {
     new Setting(containerEl)
-      .setHeading()
       .setName(this.plugin.t('settings.language.title'))
       .setDesc(this.plugin.t('settings.language.description'))
 
     containerEl.createEl('hr')
 
     new Setting(containerEl)
-      .setName(this.plugin.t('settings.language.title'))
       .addDropdown((dropdown) =>
         dropdown
           .addOptions({
