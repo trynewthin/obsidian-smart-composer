@@ -179,6 +179,9 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       abortController.abort()
     }
     activeStreamAbortControllersRef.current = []
+    setQueryProgress({
+      type: 'idle',
+    })
   }
 
   const handleLoadConversation = async (conversationId: string) => {
@@ -315,6 +318,10 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
         }
       } catch (error) {
         if (error.name === 'AbortError') {
+          activeStreamAbortControllersRef.current = []
+          setQueryProgress({
+            type: 'idle',
+          })
           return
         } else {
           throw error
