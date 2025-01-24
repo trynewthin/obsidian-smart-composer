@@ -991,6 +991,17 @@ button.smtcmp-chat-input-model-select {
   padding: var(--size-4-2);
   font-size: var(--font-smallest);
   animation: fadeIn 0.1s ease-in-out;
+  transform: translateX(-50px);
+  right: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .smtcmp-similarity-search-results {
