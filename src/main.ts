@@ -12,6 +12,7 @@ import {
   parseSmartCopilotSettings,
 } from './types/settings'
 import { getMentionableBlockData } from './utils/obsidian'
+import { Language, t as translate } from './i18n'
 
 // Remember to rename these classes and interfaces!
 export default class SmartCopilotPlugin extends Plugin {
@@ -22,12 +23,23 @@ export default class SmartCopilotPlugin extends Plugin {
   ragEngine: RAGEngine | null = null
   private dbManagerInitPromise: Promise<DatabaseManager> | null = null
   private ragEngineInitPromise: Promise<RAGEngine> | null = null
+  private language: Language = 'en'
+
+  t(key: string, params?: Record<string, string>): string {
+    return translate(key, this.language, params)
+  }
+
+  setLanguage(lang: Language) {
+    this.language = lang
+    this.settings.language = lang
+    this.saveData(this.settings)
+  }
 
   async onload() {
     await this.loadSettings()
 
     this.registerView(CHAT_VIEW_TYPE, (leaf) => new ChatView(leaf, this))
-    this.registerView(APPLY_VIEW_TYPE, (leaf) => new ApplyView(leaf))
+    this.registerView(APPLY_VIEW_TYPE, (leaf) => new ApplyView(leaf, this))
 
     // This creates an icon in the left ribbon.
     this.addRibbonIcon('wand-sparkles', 'Open smart composer', () =>
@@ -122,11 +134,13 @@ export default class SmartCopilotPlugin extends Plugin {
 
   async loadSettings() {
     this.settings = parseSmartCopilotSettings(await this.loadData())
+    this.language = this.settings.language
     await this.saveData(this.settings) // Save updated settings
   }
 
   async setSettings(newSettings: SmartCopilotSettings) {
     this.settings = newSettings
+    this.language = newSettings.language
     await this.saveData(newSettings)
     this.ragEngine?.setSettings(newSettings)
     this.settingsChangeListeners.forEach((listener) => listener(newSettings))

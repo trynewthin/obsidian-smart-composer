@@ -42,6 +42,9 @@ const smartCopilotSettingsSchema = z.object({
   // Version
   version: z.literal(SETTINGS_SCHEMA_VERSION).catch(SETTINGS_SCHEMA_VERSION),
 
+  // Language
+  language: z.enum(['en', 'zh']).catch('en'),
+
   // API Keys
   openAIApiKey: z.string().catch(''),
   anthropicApiKey: z.string().catch(''),

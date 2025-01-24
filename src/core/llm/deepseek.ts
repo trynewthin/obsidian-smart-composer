@@ -34,7 +34,7 @@ export class DeepSeekProvider implements BaseLLMProvider {
   ): Promise<LLMResponseNonStreaming> {
     if (!this.client.apiKey) {
       throw new LLMAPIKeyNotSetException(
-        'DeepSeek API key is missing. Please set it in settings menu.',
+        'DeepSeek API key is missing. Please set it in settings menu.'
       )
     }
 
@@ -43,7 +43,7 @@ export class DeepSeekProvider implements BaseLLMProvider {
     } catch (error) {
       if (error instanceof OpenAI.AuthenticationError) {
         throw new LLMAPIKeyInvalidException(
-          'DeepSeek API key is invalid. Please update it in settings menu.',
+          'DeepSeek API key is invalid. Please update it in settings menu.'
         )
       }
       throw error
@@ -57,7 +57,7 @@ export class DeepSeekProvider implements BaseLLMProvider {
   ): Promise<AsyncIterable<LLMResponseStreaming>> {
     if (!this.client.apiKey) {
       throw new LLMAPIKeyNotSetException(
-        'DeepSeek API key is missing. Please set it in settings menu.',
+        'DeepSeek API key is missing. Please set it in settings menu.'
       )
     }
 
@@ -66,7 +66,7 @@ export class DeepSeekProvider implements BaseLLMProvider {
     } catch (error) {
       if (error instanceof OpenAI.AuthenticationError) {
         throw new LLMAPIKeyInvalidException(
-          'DeepSeek API key is invalid. Please update it in settings menu.',
+          'DeepSeek API key is invalid. Please update it in settings menu.'
         )
       }
       throw error

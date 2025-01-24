@@ -9,6 +9,7 @@ import { AppProvider } from './contexts/app-context'
 import { DarkModeProvider } from './contexts/dark-mode-context'
 import { DatabaseProvider } from './contexts/database-context'
 import { DialogContainerProvider } from './contexts/dialog-container-context'
+import { I18nProvider } from './contexts/i18n-context'
 import { LLMProvider } from './contexts/llm-context'
 import { RAGProvider } from './contexts/rag-context'
 import { SettingsProvider } from './contexts/settings-context'
@@ -40,7 +41,7 @@ export class ChatView extends ItemView {
   }
 
   getDisplayText() {
-    return 'Smart composer chat'
+    return this.plugin.t('chat.title')
   }
 
   async onOpen() {
@@ -80,23 +81,25 @@ export class ChatView extends ItemView {
           }
         >
           <DarkModeProvider>
-            <LLMProvider>
-              <DatabaseProvider
-                getDatabaseManager={() => this.plugin.getDbManager()}
-              >
-                <RAGProvider getRAGEngine={() => this.plugin.getRAGEngine()}>
-                  <QueryClientProvider client={queryClient}>
-                    <React.StrictMode>
-                      <DialogContainerProvider
-                        container={this.containerEl.children[1] as HTMLElement}
-                      >
-                        <Chat ref={this.chatRef} {...this.initialChatProps} />
-                      </DialogContainerProvider>
-                    </React.StrictMode>
-                  </QueryClientProvider>
-                </RAGProvider>
-              </DatabaseProvider>
-            </LLMProvider>
+            <I18nProvider>
+              <LLMProvider>
+                <DatabaseProvider
+                  getDatabaseManager={() => this.plugin.getDbManager()}
+                >
+                  <RAGProvider getRAGEngine={() => this.plugin.getRAGEngine()}>
+                    <QueryClientProvider client={queryClient}>
+                      <React.StrictMode>
+                        <DialogContainerProvider
+                          container={this.containerEl.children[1] as HTMLElement}
+                        >
+                          <Chat ref={this.chatRef} {...this.initialChatProps} />
+                        </DialogContainerProvider>
+                      </React.StrictMode>
+                    </QueryClientProvider>
+                  </RAGProvider>
+                </DatabaseProvider>
+              </LLMProvider>
+            </I18nProvider>
           </DarkModeProvider>
         </SettingsProvider>
       </AppProvider>,

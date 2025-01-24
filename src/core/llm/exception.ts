@@ -32,3 +32,10 @@ export class LLMRateLimitExceededException extends Error {
     this.name = 'LLMRateLimitExceededException'
   }
 }
+
+export class LLMRequestException extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'LLMRequestException'
+  }
+}

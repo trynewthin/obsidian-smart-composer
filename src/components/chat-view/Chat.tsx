@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ApplyViewState } from '../../ApplyView'
 import { APPLY_VIEW_TYPE } from '../../constants'
 import { useApp } from '../../contexts/app-context'
+import { useI18n } from '../../contexts/i18n-context'
 import { useLLM } from '../../contexts/llm-context'
 import { useRAG } from '../../contexts/rag-context'
 import { useSettings } from '../../contexts/settings-context'
@@ -39,6 +40,7 @@ import {
 import { readTFileContent } from '../../utils/obsidian'
 import { openSettingsModalWithError } from '../../utils/openSettingsModal'
 import { PromptGenerator } from '../../utils/promptGenerator'
+import SmartCopilotPlugin from '../../main'
 
 import AssistantMessageActions from './AssistantMessageActions'
 import ChatUserInput, { ChatUserInputRef } from './chat-input/ChatUserInput'
@@ -78,6 +80,8 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
   const app = useApp()
   const { settings } = useSettings()
   const { getRAGEngine } = useRAG()
+  const { t } = useI18n()
+  const plugin = (app as any).plugins.plugins['obsidian-smart-composer'] as SmartCopilotPlugin
 
   const {
     createOrUpdateConversation,
@@ -193,7 +197,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
         type: 'idle',
       })
     } catch (error) {
-      new Notice('Failed to load conversation')
+      new Notice(plugin.t('chat.errors.failedToLoad'))
       console.error('Failed to load conversation', error)
     }
   }
@@ -321,15 +325,16 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       setQueryProgress({
         type: 'idle',
       })
-      if (
-        error instanceof LLMAPIKeyNotSetException ||
-        error instanceof LLMAPIKeyInvalidException ||
-        error instanceof LLMBaseUrlNotSetException ||
-        error instanceof LLMModelNotSetException
-      ) {
-        openSettingsModalWithError(app, error.message)
+      if (error instanceof LLMAPIKeyNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.apiKeyMissing'))
+      } else if (error instanceof LLMAPIKeyInvalidException) {
+        openSettingsModalWithError(app, t('chat.errors.apiKeyInvalid'))
+      } else if (error instanceof LLMBaseUrlNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.baseUrlMissing'))
+      } else if (error instanceof LLMModelNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.modelMissing'))
       } else {
-        new Notice(error.message)
+        new Notice(t('chat.errors.failedToGenerate'))
         console.error('Failed to generate response', error)
       }
     },
@@ -352,9 +357,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
     }) => {
       const activeFile = app.workspace.getActiveFile()
       if (!activeFile) {
-        throw new Error(
-          'No file is currently open to apply changes. Please open a file and try again.',
-        )
+        throw new Error(t('chat.errors.noFileOpen'))
       }
       const activeFileContent = await readTFileContent(activeFile, app.vault)
 
@@ -367,7 +370,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
         generateResponse,
       )
       if (!updatedFileContent) {
-        throw new Error('Failed to apply changes')
+        throw new Error(t('chat.errors.failedToApply'))
       }
 
       await app.workspace.getLeaf(true).setViewState({
@@ -381,13 +384,14 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       })
     },
     onError: (error) => {
-      if (
-        error instanceof LLMAPIKeyNotSetException ||
-        error instanceof LLMAPIKeyInvalidException ||
-        error instanceof LLMBaseUrlNotSetException ||
-        error instanceof LLMModelNotSetException
-      ) {
-        openSettingsModalWithError(app, error.message)
+      if (error instanceof LLMAPIKeyNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.apiKeyMissing'))
+      } else if (error instanceof LLMAPIKeyInvalidException) {
+        openSettingsModalWithError(app, t('chat.errors.apiKeyInvalid'))
+      } else if (error instanceof LLMBaseUrlNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.baseUrlMissing'))
+      } else if (error instanceof LLMModelNotSetException) {
+        openSettingsModalWithError(app, t('chat.errors.modelMissing'))
       } else {
         new Notice(error.message)
         console.error('Failed to apply changes', error)
@@ -532,14 +536,72 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
     },
   }))
 
+  const handleApplyChanges = async (messageId: string) => {
+    const message = chatMessages.find((m) => m.id === messageId)
+    if (!message || !message.content) return
+
+    const activeFile = app.workspace.getActiveFile()
+    if (!activeFile) {
+      new Notice(plugin.t('chat.errors.noFileOpen'))
+      return
+    }
+
+    try {
+      const originalContent = await readTFileContent(activeFile, app.vault)
+      const messageContent = typeof message.content === 'string' 
+        ? message.content 
+        : editorStateToPlainText(message.content)
+      const newContent = await applyChangesToFile(
+        messageContent,
+        activeFile,
+        originalContent,
+        chatMessages,
+        applyModel,
+        generateResponse
+      )
+
+      if (!newContent) {
+        throw new Error(plugin.t('chat.errors.failedToApply'))
+      }
+
+      const leaf = app.workspace.getLeaf(true)
+      await leaf.setViewState({
+        type: APPLY_VIEW_TYPE,
+        state: {
+          file: activeFile,
+          originalContent,
+          newContent,
+        } as ApplyViewState,
+      })
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const handleError = (error: unknown) => {
+    if (error instanceof LLMAPIKeyNotSetException) {
+      openSettingsModalWithError(app, plugin.t('chat.errors.apiKeyMissing'))
+    } else if (error instanceof LLMAPIKeyInvalidException) {
+      openSettingsModalWithError(app, plugin.t('chat.errors.apiKeyInvalid'))
+    } else if (error instanceof LLMBaseUrlNotSetException) {
+      openSettingsModalWithError(app, plugin.t('chat.errors.baseUrlMissing'))
+    } else if (error instanceof LLMModelNotSetException) {
+      openSettingsModalWithError(app, plugin.t('chat.errors.modelMissing'))
+    } else {
+      new Notice(plugin.t('chat.errors.failedToGenerate'))
+      console.error('Failed to generate response', error)
+    }
+  }
+
   return (
     <div className="smtcmp-chat-container">
       <div className="smtcmp-chat-header">
-        <h1 className="smtcmp-chat-header-title">Chat</h1>
+        <h1 className="smtcmp-chat-header-title">{t('chat.title')}</h1>
         <div className="smtcmp-chat-header-buttons">
           <button
             onClick={() => handleNewChat()}
             className="smtcmp-chat-list-dropdown"
+            aria-label={t('chat.newChat')}
           >
             <Plus size={18} />
           </button>
@@ -641,10 +703,10 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
           ),
         )}
         <QueryProgress state={queryProgress} />
-        {submitMutation.isPending && (
+        {activeStreamAbortControllersRef.current.length > 0 && (
           <button onClick={abortActiveStreams} className="smtcmp-stop-gen-btn">
             <CircleStop size={16} />
-            <div>Stop Generation</div>
+            <div>{t('chat.stopGeneration')}</div>
           </button>
         )}
       </div>

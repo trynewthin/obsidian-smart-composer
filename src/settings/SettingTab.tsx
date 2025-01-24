@@ -28,6 +28,7 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     const { containerEl } = this
     containerEl.empty()
 
+    this.renderAPIKeysSection(containerEl)
     this.renderLanguageSection(containerEl)
     this.renderAPIKeysSection(containerEl)
     this.renderModelSection(containerEl)

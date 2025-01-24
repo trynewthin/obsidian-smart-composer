@@ -4,6 +4,7 @@ import { Root, createRoot } from 'react-dom/client'
 import ApplyViewRoot from './components/apply-view/ApplyViewRoot'
 import { APPLY_VIEW_TYPE } from './constants'
 import { AppProvider } from './contexts/app-context'
+import SmartCopilotPlugin from './main'
 
 export type ApplyViewState = {
   file: TFile
@@ -13,11 +14,12 @@ export type ApplyViewState = {
 
 export class ApplyView extends View {
   private root: Root | null = null
-
   private state: ApplyViewState | null = null
+  private plugin: SmartCopilotPlugin
 
-  constructor(leaf: WorkspaceLeaf) {
+  constructor(leaf: WorkspaceLeaf, plugin: SmartCopilotPlugin) {
     super(leaf)
+    this.plugin = plugin
   }
 
   getViewType() {
@@ -25,7 +27,7 @@ export class ApplyView extends View {
   }
 
   getDisplayText() {
-    return `Applying: ${this.state?.file?.name ?? ''}`
+    return this.plugin.t('apply.title', { filename: this.state?.file?.name ?? '' })
   }
 
   async setState(state: ApplyViewState) {
