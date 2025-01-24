@@ -107,17 +107,32 @@ export class PromptGenerator {
       systemMessage,
       ...(customInstructionMessage ? [customInstructionMessage] : []),
       ...(currentFileMessage ? [currentFileMessage] : []),
-      ...compiledMessages.slice(-20).map((message): RequestMessage => {
+      ...compiledMessages.slice(-20).flatMap((message, index, array): RequestMessage[] => {
+        // For DeepSeek Reasoner, we need to interleave user and assistant messages
         if (message.role === 'user') {
-          return {
+          const nextMessage = array[index + 1];
+          if (nextMessage && nextMessage.role === 'user') {
+            // If next message is also a user message, add a dummy assistant response
+            return [
+              {
+                role: 'user',
+                content: message.promptContent ?? '',
+              },
+              {
+                role: 'assistant',
+                content: 'I understand.',
+              }
+            ];
+          }
+          return [{
             role: 'user',
             content: message.promptContent ?? '',
-          }
+          }];
         } else {
-          return {
+          return [{
             role: 'assistant',
             content: message.content,
-          }
+          }];
         }
       }),
       ...(shouldUseRAG ? [this.getRagInstructionMessage()] : []),

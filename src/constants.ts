@@ -88,6 +88,22 @@ export const CHAT_MODEL_OPTIONS: ModelOption[] = [
       baseURL: '',
     },
   },
+  {
+    id: 'deepseek/deepseek-chat',
+    name: 'deepseek-chat',
+    model: {
+      provider: 'deepseek',
+      model: 'deepseek-chat',
+    },
+  },
+  {
+    id: 'deepseek/deepseek-reasoner',
+    name: 'deepseek-reasoner',
+    model: {
+      provider: 'deepseek',
+      model: 'deepseek-reasoner',
+    },
+  },
 ]
 
 export const APPLY_MODEL_OPTIONS: ModelOption[] = [
@@ -156,6 +172,14 @@ export const APPLY_MODEL_OPTIONS: ModelOption[] = [
       model: '',
       apiKey: '',
       baseURL: '',
+    },
+  },
+  {
+    id: 'deepseek/deepseek-chat',
+    name: 'deepseek-chat',
+    model: {
+      provider: 'deepseek',
+      model: 'deepseek-chat',
     },
   },
 ]
@@ -249,3 +273,8 @@ export const GROQ_PRICES: Record<string, ModelPricing> = {
 }
 
 export const PGLITE_DB_PATH = '.smtcmp_vector_db.tar.gz'
+
+export const DEEPSEEK_PRICES: Record<string, ModelPricing> = {
+  'deepseek-chat': { input: 0.2, output: 0.8 },
+  'deepseek-reasoner': { input: 0.4, output: 1.6 },
+}

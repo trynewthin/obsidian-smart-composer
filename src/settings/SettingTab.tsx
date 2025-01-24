@@ -96,6 +96,18 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
           })
         }),
     )
+
+    new Setting(containerEl).setName('DeepSeek API key').addText((text) =>
+      text
+        .setPlaceholder('Enter your API key')
+        .setValue(this.plugin.settings.deepseekApiKey)
+        .onChange(async (value) => {
+          await this.plugin.setSettings({
+            ...this.plugin.settings,
+            deepseekApiKey: value,
+          })
+        }),
+    )
   }
 
   renderModelSection(containerEl: HTMLElement): void {

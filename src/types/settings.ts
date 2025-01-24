@@ -6,7 +6,7 @@ import {
   EMBEDDING_MODEL_OPTIONS,
 } from '../constants'
 
-export const SETTINGS_SCHEMA_VERSION = 1
+export const SETTINGS_SCHEMA_VERSION = 2
 
 const ollamaModelSchema = z.object({
   baseUrl: z.string().catch(''),
@@ -47,6 +47,7 @@ const smartCopilotSettingsSchema = z.object({
   anthropicApiKey: z.string().catch(''),
   geminiApiKey: z.string().catch(''),
   groqApiKey: z.string().catch(''),
+  deepseekApiKey: z.string().catch(''),
 
   // Chat Models
   chatModelId: chatModelIdSchema.catch('anthropic/claude-3.5-sonnet-latest'),
@@ -169,6 +170,15 @@ const MIGRATIONS: Migration[] = [
         delete newData.ollamaBaseUrl
       }
 
+      return newData
+    },
+  },
+  {
+    fromVersion: 1,
+    toVersion: 2,
+    migrate: (data) => {
+      const newData = { ...data }
+      newData.deepseekApiKey = ''
       return newData
     },
   },

@@ -1,5 +1,5 @@
 export type NativeLLMModel = {
-  provider: 'openai' | 'anthropic' | 'gemini' | 'groq'
+  provider: 'openai' | 'anthropic' | 'gemini' | 'groq' | 'deepseek'
   model: string
 }
 

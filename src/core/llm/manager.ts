@@ -10,6 +10,7 @@ import {
 } from '../../types/llm/response'
 
 import { AnthropicProvider } from './anthropic'
+import { DeepSeekProvider } from './deepseek'
 import { GeminiProvider } from './gemini'
 import { GroqProvider } from './groq'
 import { OllamaProvider } from './ollama'
@@ -34,6 +35,7 @@ class LLMManager implements LLMManagerInterface {
   private anthropicProvider: AnthropicProvider
   private geminiProvider: GeminiProvider
   private groqProvider: GroqProvider
+  private deepseekProvider: DeepSeekProvider
   private ollamaProvider: OllamaProvider
   private openaiCompatibleProvider: OpenAICompatibleProvider
 
@@ -42,11 +44,13 @@ class LLMManager implements LLMManagerInterface {
     anthropic?: string
     gemini?: string
     groq?: string
+    deepseek?: string
   }) {
     this.openaiProvider = new OpenAIAuthenticatedProvider(apiKeys.openai ?? '')
     this.anthropicProvider = new AnthropicProvider(apiKeys.anthropic ?? '')
     this.geminiProvider = new GeminiProvider(apiKeys.gemini ?? '')
     this.groqProvider = new GroqProvider(apiKeys.groq ?? '')
+    this.deepseekProvider = new DeepSeekProvider(apiKeys.deepseek ?? '')
     this.ollamaProvider = new OllamaProvider()
     this.openaiCompatibleProvider = new OpenAICompatibleProvider()
   }
@@ -77,6 +81,12 @@ class LLMManager implements LLMManagerInterface {
         )
       case 'groq':
         return await this.groqProvider.generateResponse(model, request, options)
+      case 'deepseek':
+        return await this.deepseekProvider.generateResponse(
+          model,
+          request,
+          options,
+        )
       case 'ollama':
         return await this.ollamaProvider.generateResponse(
           model,
@@ -115,6 +125,8 @@ class LLMManager implements LLMManagerInterface {
         return await this.geminiProvider.streamResponse(model, request, options)
       case 'groq':
         return await this.groqProvider.streamResponse(model, request, options)
+      case 'deepseek':
+        return await this.deepseekProvider.streamResponse(model, request, options)
       case 'ollama':
         return await this.ollamaProvider.streamResponse(model, request, options)
       case 'openai-compatible':

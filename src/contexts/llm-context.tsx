@@ -100,6 +100,7 @@ export function LLMProvider({ children }: PropsWithChildren) {
       anthropic: settings.anthropicApiKey,
       gemini: settings.geminiApiKey,
       groq: settings.groqApiKey,
+      deepseek: settings.deepseekApiKey,
     })
     setLLMManager(manager)
   }, [
@@ -107,6 +108,7 @@ export function LLMProvider({ children }: PropsWithChildren) {
     settings.anthropicApiKey,
     settings.geminiApiKey,
     settings.groqApiKey,
+    settings.deepseekApiKey,
   ])
 
   const generateResponse = useCallback(
