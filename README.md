@@ -1,3 +1,18 @@
+# Smart Composer (Fork)
+
+This is a fork of [glowingjade/obsidian-smart-composer](https://github.com/glowingjade/obsidian-smart-composer) with the following improvements:
+
+- Fixed stop generation button not disappearing after stopping
+- Added DeepSeek model support (新增 DeepSeek 模型支持)
+  - Currently supports chat completion (目前支持对话功能)
+  - More DeepSeek features coming soon (未来将支持更多 DeepSeek 特性)
+- Added multi-language support (新增多语言支持)
+  - Interface available in multiple languages (界面支持多种语言显示)
+  - Easy to extend with new language packs (易于扩展新的语言包)
+
+
+---
+
 <h1 align="center">Smart Composer</h1>
 
 <p align="center">
