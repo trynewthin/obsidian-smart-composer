@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react'
-import { Language, getCurrentLanguage, t as translate } from '../i18n'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { Language, t as translate } from '../i18n'
+import SmartCopilotPlugin from '../main'
 
 type I18nContextType = {
   language: Language
@@ -9,8 +10,26 @@ type I18nContextType = {
 
 const I18nContext = createContext<I18nContextType | null>(null)
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>(getCurrentLanguage())
+export function I18nProvider({ 
+  children,
+  plugin,
+}: { 
+  children: React.ReactNode
+  plugin: SmartCopilotPlugin
+}) {
+  const [language, setLanguageState] = useState<Language>(plugin.settings.language)
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang)
+    plugin.setLanguage(lang)
+  }
+
+  useEffect(() => {
+    const unsubscribe = plugin.addSettingsChangeListener((newSettings) => {
+      setLanguageState(newSettings.language)
+    })
+    return unsubscribe
+  }, [plugin])
 
   const t = (key: string, params?: Record<string, string>) => {
     return translate(key, language, params)

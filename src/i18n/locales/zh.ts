@@ -117,6 +117,10 @@ export const zh = {
     }
   },
   apply: {
-    title: '正在应用: {filename}'
+    title: '正在应用: {filename}',
+    accept: '接受',
+    reject: '拒绝',
+    acceptLine: '接受此行',
+    excludeLine: '排除此行'
   }
 } 

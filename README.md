@@ -2,7 +2,6 @@
 
 This is a fork of [glowingjade/obsidian-smart-composer](https://github.com/glowingjade/obsidian-smart-composer) with the following improvements:
 
-- Fixed stop generation button not disappearing after stopping
 - Added DeepSeek model support (新增 DeepSeek 模型支持)
   - Currently supports chat completion (目前支持对话功能)
   - More DeepSeek features coming soon (未来将支持更多 DeepSeek 特性)

@@ -81,7 +81,7 @@ export class ChatView extends ItemView {
           }
         >
           <DarkModeProvider>
-            <I18nProvider>
+            <I18nProvider plugin={this.plugin}>
               <LLMProvider>
                 <DatabaseProvider
                   getDatabaseManager={() => this.plugin.getDbManager()}

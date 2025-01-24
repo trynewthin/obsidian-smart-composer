@@ -117,6 +117,10 @@ export const en = {
     }
   },
   apply: {
-    title: 'Applying: {filename}'
+    title: 'Applying: {filename}',
+    accept: 'Accept',
+    reject: 'Reject',
+    acceptLine: 'Accept line',
+    excludeLine: 'Exclude line'
   }
 } 

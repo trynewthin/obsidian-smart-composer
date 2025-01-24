@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 import { ApplyViewState } from '../../ApplyView'
 import { useApp } from '../../contexts/app-context'
+import { useI18n } from '../../contexts/i18n-context'
 
 export default function ApplyViewRoot({
   state,
@@ -18,6 +19,7 @@ export default function ApplyViewRoot({
   const excludeIcon = getIcon('x')
 
   const app = useApp()
+  const { t } = useI18n()
 
   const [diff, setDiff] = useState<Change[]>(
     diffLines(state.originalContent, state.newContent),
@@ -72,24 +74,24 @@ export default function ApplyViewRoot({
         </div>
         <div className="view-header-title-container mod-at-start">
           <div className="view-header-title">
-            Applying: {state?.file?.name ?? ''}
+            {t('apply.title', { filename: state?.file?.name ?? '' })}
           </div>
           <div className="view-actions">
             <button
               className="clickable-icon view-action smtcmp-approve-button"
-              aria-label="Accept changes"
+              aria-label={t('apply.accept')}
               onClick={handleAccept}
             >
               {acceptIcon && <CheckIcon size={14} />}
-              Accept
+              <span>{t('apply.accept')}</span>
             </button>
             <button
               className="clickable-icon view-action smtcmp-reject-button"
-              aria-label="Reject changes"
+              aria-label={t('apply.reject')}
               onClick={handleReject}
             >
               {rejectIcon && <X size={14} />}
-              Reject
+              <span>{t('apply.reject')}</span>
             </button>
           </div>
         </div>
@@ -98,41 +100,39 @@ export default function ApplyViewRoot({
       <div className="view-content">
         <div className="markdown-source-view cm-s-obsidian mod-cm6 node-insert-event is-readable-line-width is-live-preview is-folding show-properties">
           <div className="cm-editor">
-            <div className="cm-scroller">
-              <div className="cm-sizer">
-                <div className="smtcmp-inline-title">
-                  {state?.file?.name
-                    ? state.file.name.replace(/\.[^/.]+$/, '')
-                    : ''}
-                </div>
-
-                {diff.map((part, index) => (
-                  <div
-                    key={index}
-                    className={`smtcmp-diff-line ${part.added ? 'added' : part.removed ? 'removed' : ''}`}
-                  >
-                    <div style={{ width: '100%' }}>{part.value}</div>
-                    {(part.added || part.removed) && (
-                      <div className="smtcmp-diff-line-actions">
-                        <button
-                          aria-label="Accept line"
-                          onClick={() => acceptDiffLine(index)}
-                          className="smtcmp-accept"
-                        >
-                          {acceptIcon && 'Y'}
-                        </button>
-                        <button
-                          aria-label="Exclude line"
-                          onClick={() => excludeDiffLine(index)}
-                          className="smtcmp-exclude"
-                        >
-                          {excludeIcon && 'N'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+            <div className="cm-sizer">
+              <div className="smtcmp-inline-title">
+                {state?.file?.name
+                  ? state.file.name.replace(/\.[^/.]+$/, '')
+                  : ''}
               </div>
+
+              {diff.map((part, index) => (
+                <div
+                  key={index}
+                  className={`smtcmp-diff-line ${part.added ? 'added' : part.removed ? 'removed' : ''}`}
+                >
+                  <div style={{ width: '100%' }}>{part.value}</div>
+                  {(part.added || part.removed) && (
+                    <div className="smtcmp-diff-line-actions">
+                      <button
+                        aria-label={t('apply.acceptLine')}
+                        onClick={() => acceptDiffLine(index)}
+                        className="smtcmp-accept"
+                      >
+                        {acceptIcon && t('apply.acceptLine')}
+                      </button>
+                      <button
+                        aria-label={t('apply.excludeLine')}
+                        onClick={() => excludeDiffLine(index)}
+                        className="smtcmp-exclude"
+                      >
+                        {excludeIcon && t('apply.excludeLine')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>

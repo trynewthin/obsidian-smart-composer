@@ -4,6 +4,7 @@ import { Root, createRoot } from 'react-dom/client'
 import ApplyViewRoot from './components/apply-view/ApplyViewRoot'
 import { APPLY_VIEW_TYPE } from './constants'
 import { AppProvider } from './contexts/app-context'
+import { I18nProvider } from './contexts/i18n-context'
 import SmartCopilotPlugin from './main'
 
 export type ApplyViewState = {
@@ -48,7 +49,9 @@ export class ApplyView extends View {
     if (!this.root || !this.state) return
     this.root.render(
       <AppProvider app={this.app}>
-        <ApplyViewRoot state={this.state} close={() => this.leaf.detach()} />
+        <I18nProvider plugin={this.plugin}>
+          <ApplyViewRoot state={this.state} close={() => this.leaf.detach()} />
+        </I18nProvider>
       </AppProvider>,
     )
   }
