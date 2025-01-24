@@ -130,6 +130,7 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     containerEl.createEl('hr')
 
     new Setting(containerEl)
+      .setName(this.plugin.t('settings.language.title'))
       .addDropdown((dropdown) =>
         dropdown
           .addOptions({
