@@ -28,6 +28,7 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     const { containerEl } = this
     containerEl.empty()
 
+    this.renderLanguageSection(containerEl)
     this.renderAPIKeysSection(containerEl)
     this.renderModelSection(containerEl)
     this.renderRAGSection(containerEl)
@@ -36,86 +37,125 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
   renderAPIKeysSection(containerEl: HTMLElement): void {
     const apiKeysHeading = new Setting(containerEl)
       .setHeading()
-      .setName('API keys')
-      .setDesc('Enter your API keys for the services you want to use')
+      .setName(this.plugin.t('settings.apiKeys.title'))
+      .setDesc(this.plugin.t('settings.apiKeys.description'))
 
     apiKeysHeading.descEl.createEl('br')
 
     apiKeysHeading.descEl.createEl('a', {
-      text: 'How to obtain API keys',
+      text: this.plugin.t('settings.apiKeys.howToObtain'),
       attr: {
         href: 'https://github.com/glowingjade/obsidian-smart-composer/wiki/1.2-Initial-Setup#getting-your-api-key',
         target: '_blank',
       },
     })
 
-    new Setting(containerEl).setName('OpenAI API key').addText((text) =>
-      text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.openAIApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setSettings({
-            ...this.plugin.settings,
-            openAIApiKey: value,
-          })
-        }),
-    )
+    new Setting(containerEl)
+      .setName(this.plugin.t('settings.apiKeys.openai'))
+      .addText((text) =>
+        text
+          .setPlaceholder(this.plugin.t('settings.apiKeys.placeholder'))
+          .setValue(this.plugin.settings.openAIApiKey)
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              openAIApiKey: value,
+            })
+          }),
+      )
 
-    new Setting(containerEl).setName('Anthropic API key').addText((text) =>
-      text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.anthropicApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setSettings({
-            ...this.plugin.settings,
-            anthropicApiKey: value,
-          })
-        }),
-    )
+    new Setting(containerEl)
+      .setName(this.plugin.t('settings.apiKeys.anthropic'))
+      .addText((text) =>
+        text
+          .setPlaceholder(this.plugin.t('settings.apiKeys.placeholder'))
+          .setValue(this.plugin.settings.anthropicApiKey)
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              anthropicApiKey: value,
+            })
+          }),
+      )
 
-    new Setting(containerEl).setName('Gemini API key').addText((text) =>
-      text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.geminiApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setSettings({
-            ...this.plugin.settings,
-            geminiApiKey: value,
-          })
-        }),
-    )
+    new Setting(containerEl)
+      .setName(this.plugin.t('settings.apiKeys.gemini'))
+      .addText((text) =>
+        text
+          .setPlaceholder(this.plugin.t('settings.apiKeys.placeholder'))
+          .setValue(this.plugin.settings.geminiApiKey)
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              geminiApiKey: value,
+            })
+          }),
+      )
 
-    new Setting(containerEl).setName('Groq API key').addText((text) =>
-      text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.groqApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setSettings({
-            ...this.plugin.settings,
-            groqApiKey: value,
-          })
-        }),
-    )
+    new Setting(containerEl)
+      .setName(this.plugin.t('settings.apiKeys.groq'))
+      .addText((text) =>
+        text
+          .setPlaceholder(this.plugin.t('settings.apiKeys.placeholder'))
+          .setValue(this.plugin.settings.groqApiKey)
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              groqApiKey: value,
+            })
+          }),
+      )
 
-    new Setting(containerEl).setName('DeepSeek API key').addText((text) =>
-      text
-        .setPlaceholder('Enter your API key')
-        .setValue(this.plugin.settings.deepseekApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setSettings({
-            ...this.plugin.settings,
-            deepseekApiKey: value,
+    new Setting(containerEl)
+      .setName(this.plugin.t('settings.apiKeys.deepseek'))
+      .addText((text) =>
+        text
+          .setPlaceholder(this.plugin.t('settings.apiKeys.placeholder'))
+          .setValue(this.plugin.settings.deepseekApiKey)
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              deepseekApiKey: value,
+            })
+          }),
+      )
+  }
+
+  renderLanguageSection(containerEl: HTMLElement): void {
+    new Setting(containerEl)
+      .setHeading()
+      .setName(this.plugin.t('settings.language.title'))
+      .setDesc(this.plugin.t('settings.language.description'))
+
+    containerEl.createEl('hr')
+
+    new Setting(containerEl)
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOptions({
+            'en': this.plugin.t('settings.language.options.en'),
+            'zh': this.plugin.t('settings.language.options.zh'),
           })
-        }),
-    )
+          .setValue(this.plugin.settings.language || 'en')
+          .onChange(async (value) => {
+            await this.plugin.setSettings({
+              ...this.plugin.settings,
+              language: value as 'en' | 'zh',
+            })
+            // Force refresh to update all translations
+            this.display()
+          }),
+      )
   }
 
   renderModelSection(containerEl: HTMLElement): void {
-    new Setting(containerEl).setHeading().setName('Model')
+    new Setting(containerEl)
+      .setHeading()
+      .setName(this.plugin.t('settings.model.title'))
 
     new Setting(containerEl)
-      .setName('Chat model')
-      .setDesc('Choose the model you want to use for chat')
+      .setName(this.plugin.t('settings.model.chat.title'))
+      .setDesc(this.plugin.t('settings.model.chat.description'))
       .addDropdown((dropdown) =>
         dropdown
           .addOptions(
@@ -142,8 +182,8 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName('Apply model')
-      .setDesc('Choose the model you want to use for apply')
+      .setName(this.plugin.t('settings.model.apply.title'))
+      .setDesc(this.plugin.t('settings.model.apply.description'))
       .addDropdown((dropdown) =>
         dropdown
           .addOptions(
@@ -173,8 +213,8 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName('Embedding model')
-      .setDesc('Choose the model you want to use for embeddings')
+      .setName(this.plugin.t('settings.model.embedding.title'))
+      .setDesc(this.plugin.t('settings.model.embedding.description'))
       .addDropdown((dropdown) =>
         dropdown
           .addOptions(
@@ -202,8 +242,8 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setHeading()
-      .setName('System prompt')
-      .setDesc('This prompt will be added to the beginning of every chat.')
+      .setName(this.plugin.t('settings.systemPrompt.title'))
+      .setDesc(this.plugin.t('settings.systemPrompt.description'))
 
     new Setting(containerEl)
       .setClass('smtcmp-settings-textarea')
@@ -223,17 +263,14 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     const ollamaContainer = containerEl.createDiv(
       'smtcmp-settings-model-container',
     )
-    let modelDropdown: DropdownComponent | null = null // Store reference to the dropdown
+    let modelDropdown: DropdownComponent | null = null
 
-    // Base URL Setting
     new Setting(ollamaContainer)
-      .setName('Base URL')
-      .setDesc(
-        'The API endpoint for your Ollama service (e.g., http://127.0.0.1:11434)',
-      )
+      .setName(this.plugin.t('settings.ollama.baseUrl.title'))
+      .setDesc(this.plugin.t('settings.ollama.baseUrl.description'))
       .addText((text) => {
         text
-          .setPlaceholder('http://127.0.0.1:11434')
+          .setPlaceholder(this.plugin.t('settings.ollama.baseUrl.placeholder'))
           .setValue(this.plugin.settings.ollamaChatModel.baseUrl || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -261,10 +298,9 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
           })
       })
 
-    // Model Setting
     new Setting(ollamaContainer)
-      .setName('Model Name')
-      .setDesc('Select a model from your Ollama instance')
+      .setName(this.plugin.t('settings.ollama.model.title'))
+      .setDesc(this.plugin.t('settings.ollama.model.description'))
       .addDropdown(async (dropdown) => {
         const currentModel = this.plugin.settings.ollamaChatModel.model
         modelDropdown = dropdown
@@ -292,13 +328,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     )
 
     new Setting(openAICompatContainer)
-      .setName('Base URL')
-      .setDesc(
-        'The API endpoint for your OpenAI-compatible service (e.g., https://api.example.com/v1)',
-      )
+      .setName(this.plugin.t('settings.openaiCompatible.baseUrl.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.baseUrl.description'))
       .addText((text) =>
         text
-          .setPlaceholder('https://api.example.com/v1')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.baseUrl.placeholder'))
           .setValue(
             this.plugin.settings.openAICompatibleChatModel.baseUrl || '',
           )
@@ -314,11 +348,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(openAICompatContainer)
-      .setName('API Key')
-      .setDesc('Your authentication key for the OpenAI-compatible service')
+      .setName(this.plugin.t('settings.openaiCompatible.apiKey.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.apiKey.description'))
       .addText((text) =>
         text
-          .setPlaceholder('Enter your API key')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.apiKey.placeholder'))
           .setValue(this.plugin.settings.openAICompatibleChatModel.apiKey || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -332,13 +366,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(openAICompatContainer)
-      .setName('Model Name')
-      .setDesc(
-        'The specific model to use with your service (e.g., llama-3.1-70b, mixtral-8x7b)',
-      )
+      .setName(this.plugin.t('settings.openaiCompatible.model.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.model.description'))
       .addText((text) =>
         text
-          .setPlaceholder('llama-3.1-70b')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.model.placeholder'))
           .setValue(this.plugin.settings.openAICompatibleChatModel.model || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -356,17 +388,14 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     const ollamaContainer = containerEl.createDiv(
       'smtcmp-settings-model-container',
     )
-    let modelDropdown: DropdownComponent | null = null // Store reference to the dropdown
+    let modelDropdown: DropdownComponent | null = null
 
-    // Base URL Setting
     new Setting(ollamaContainer)
-      .setName('Base URL')
-      .setDesc(
-        'The API endpoint for your Ollama service (e.g., http://127.0.0.1:11434)',
-      )
+      .setName(this.plugin.t('settings.ollama.baseUrl.title'))
+      .setDesc(this.plugin.t('settings.ollama.baseUrl.description'))
       .addText((text) => {
         text
-          .setPlaceholder('http://127.0.0.1:11434')
+          .setPlaceholder(this.plugin.t('settings.ollama.baseUrl.placeholder'))
           .setValue(this.plugin.settings.ollamaApplyModel.baseUrl || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -394,10 +423,9 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
           })
       })
 
-    // Model Setting
     new Setting(ollamaContainer)
-      .setName('Model Name')
-      .setDesc('Select a model from your Ollama instance')
+      .setName(this.plugin.t('settings.ollama.model.title'))
+      .setDesc(this.plugin.t('settings.ollama.model.description'))
       .addDropdown(async (dropdown) => {
         const currentModel = this.plugin.settings.ollamaApplyModel.model
         modelDropdown = dropdown
@@ -425,13 +453,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     )
 
     new Setting(openAICompatContainer)
-      .setName('Base URL')
-      .setDesc(
-        'The API endpoint for your OpenAI-compatible service (e.g., https://api.example.com/v1)',
-      )
+      .setName(this.plugin.t('settings.openaiCompatible.baseUrl.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.baseUrl.description'))
       .addText((text) =>
         text
-          .setPlaceholder('https://api.example.com/v1')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.baseUrl.placeholder'))
           .setValue(
             this.plugin.settings.openAICompatibleApplyModel.baseUrl || '',
           )
@@ -447,11 +473,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(openAICompatContainer)
-      .setName('API Key')
-      .setDesc('Your authentication key for the OpenAI-compatible service')
+      .setName(this.plugin.t('settings.openaiCompatible.apiKey.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.apiKey.description'))
       .addText((text) =>
         text
-          .setPlaceholder('Enter your API key')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.apiKey.placeholder'))
           .setValue(
             this.plugin.settings.openAICompatibleApplyModel.apiKey || '',
           )
@@ -467,13 +493,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(openAICompatContainer)
-      .setName('Model Name')
-      .setDesc(
-        'The specific model to use with your service (e.g., llama-3.1-70b, mixtral-8x7b)',
-      )
+      .setName(this.plugin.t('settings.openaiCompatible.model.title'))
+      .setDesc(this.plugin.t('settings.openaiCompatible.model.description'))
       .addText((text) =>
         text
-          .setPlaceholder('llama-3.1-70b')
+          .setPlaceholder(this.plugin.t('settings.openaiCompatible.model.placeholder'))
           .setValue(this.plugin.settings.openAICompatibleApplyModel.model || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -493,13 +517,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
     )
 
     new Setting(ollamaContainer)
-      .setName('Base URL')
-      .setDesc(
-        'The API endpoint for your Ollama service (e.g., http://127.0.0.1:11434)',
-      )
+      .setName(this.plugin.t('settings.ollama.baseUrl.title'))
+      .setDesc(this.plugin.t('settings.ollama.baseUrl.description'))
       .addText((text) =>
         text
-          .setPlaceholder('http://127.0.0.1:11434')
+          .setPlaceholder(this.plugin.t('settings.ollama.baseUrl.placeholder'))
           .setValue(this.plugin.settings.ollamaEmbeddingModel.baseUrl || '')
           .onChange(async (value) => {
             await this.plugin.setSettings({
@@ -514,15 +536,13 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
   }
 
   renderRAGSection(containerEl: HTMLElement): void {
-    new Setting(containerEl).setHeading().setName('RAG')
+    new Setting(containerEl).setHeading().setName(this.plugin.t('settings.rag.title'))
 
     new Setting(containerEl)
-      .setName('Include patterns')
-      .setDesc(
-        'If any patterns are specified, ONLY files matching at least one pattern will be included in indexing. One pattern per line. Uses glob patterns (e.g., "notes/*", "*.md"). Leave empty to include all files not excluded by exclude patterns. After changing this, use the command "Rebuild entire vault index" to apply changes.',
-      )
+      .setName(this.plugin.t('settings.rag.includePatterns.title'))
+      .setDesc(this.plugin.t('settings.rag.includePatterns.description'))
       .addButton((button) =>
-        button.setButtonText('Test patterns').onClick(async () => {
+        button.setButtonText(this.plugin.t('settings.rag.includePatterns.testButton')).onClick(async () => {
           const patterns = this.plugin.settings.ragOptions.includePatterns
           const includedFiles = await findFilesMatchingPatterns(
             patterns,
@@ -552,12 +572,10 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(containerEl)
-      .setName('Exclude patterns')
-      .setDesc(
-        'Files matching ANY of these patterns will be excluded from indexing. One pattern per line. Uses glob patterns (e.g., "private/*", "*.tmp"). Leave empty to exclude nothing. After changing this, use the command "Rebuild entire vault index" to apply changes.',
-      )
+      .setName(this.plugin.t('settings.rag.excludePatterns.title'))
+      .setDesc(this.plugin.t('settings.rag.excludePatterns.description'))
       .addButton((button) =>
-        button.setButtonText('Test patterns').onClick(async () => {
+        button.setButtonText(this.plugin.t('settings.rag.excludePatterns.testButton')).onClick(async () => {
           const patterns = this.plugin.settings.ragOptions.excludePatterns
           const excludedFiles = await findFilesMatchingPatterns(
             patterns,
@@ -587,13 +605,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(containerEl)
-      .setName('Chunk size')
-      .setDesc(
-        'Set the chunk size for text splitting. After changing this, please re-index the vault using the "Rebuild entire vault index" command.',
-      )
+      .setName(this.plugin.t('settings.rag.chunkSize.title'))
+      .setDesc(this.plugin.t('settings.rag.chunkSize.description'))
       .addText((text) =>
         text
-          .setPlaceholder('1000')
+          .setPlaceholder(this.plugin.t('settings.rag.chunkSize.placeholder'))
           .setValue(String(this.plugin.settings.ragOptions.chunkSize))
           .onChange(async (value) => {
             const chunkSize = parseInt(value, 10)
@@ -610,13 +626,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(containerEl)
-      .setName('Threshold tokens')
-      .setDesc(
-        'Maximum number of tokens before switching to RAG. If the total tokens from mentioned files exceed this, RAG will be used instead of including all file contents.',
-      )
+      .setName(this.plugin.t('settings.rag.thresholdTokens.title'))
+      .setDesc(this.plugin.t('settings.rag.thresholdTokens.description'))
       .addText((text) =>
         text
-          .setPlaceholder('8192')
+          .setPlaceholder(this.plugin.t('settings.rag.thresholdTokens.placeholder'))
           .setValue(String(this.plugin.settings.ragOptions.thresholdTokens))
           .onChange(async (value) => {
             const thresholdTokens = parseInt(value, 10)
@@ -633,13 +647,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(containerEl)
-      .setName('Minimum similarity')
-      .setDesc(
-        'Minimum similarity score for RAG results. Higher values return more relevant but potentially fewer results.',
-      )
+      .setName(this.plugin.t('settings.rag.minSimilarity.title'))
+      .setDesc(this.plugin.t('settings.rag.minSimilarity.description'))
       .addText((text) =>
         text
-          .setPlaceholder('0.0')
+          .setPlaceholder(this.plugin.t('settings.rag.minSimilarity.placeholder'))
           .setValue(String(this.plugin.settings.ragOptions.minSimilarity))
           .onChange(async (value) => {
             const minSimilarity = parseFloat(value)
@@ -656,13 +668,11 @@ export class SmartCopilotSettingTab extends PluginSettingTab {
       )
 
     new Setting(containerEl)
-      .setName('Limit')
-      .setDesc(
-        'Maximum number of RAG results to include in the prompt. Higher values provide more context but increase token usage.',
-      )
+      .setName(this.plugin.t('settings.rag.limit.title'))
+      .setDesc(this.plugin.t('settings.rag.limit.description'))
       .addText((text) =>
         text
-          .setPlaceholder('10')
+          .setPlaceholder(this.plugin.t('settings.rag.limit.placeholder'))
           .setValue(String(this.plugin.settings.ragOptions.limit))
           .onChange(async (value) => {
             const limit = parseInt(value, 10)
