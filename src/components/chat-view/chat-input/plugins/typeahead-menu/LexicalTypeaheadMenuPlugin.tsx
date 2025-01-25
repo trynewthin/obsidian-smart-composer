@@ -281,6 +281,24 @@ export function LexicalTypeaheadMenuPlugin<TOption extends MenuOption>({
     openTypeahead,
   ])
 
+  useEffect(() => {
+    if (!resolution) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      const menuElement = anchorElementRef.current
+      
+      if (menuElement && !menuElement.contains(target)) {
+        closeTypeahead()
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [resolution, anchorElementRef, closeTypeahead])
+
   return resolution === null || editor === null ? null : (
     <LexicalMenu
       close={closeTypeahead}

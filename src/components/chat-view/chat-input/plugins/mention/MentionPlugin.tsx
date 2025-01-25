@@ -146,6 +146,21 @@ function MentionsTypeaheadMenuItem({
   }
 
   const Icon = getMentionableIcon(option.mentionable)
+
+  // 获取文件路径
+  const getDisplayPath = () => {
+    switch (option.mentionable.type) {
+      case 'file':
+        return option.mentionable.file.path
+      case 'folder':
+        return option.mentionable.folder.path
+      case 'vault':
+        return 'Vault'
+      default:
+        return ''
+    }
+  }
+
   return (
     <li
       key={option.key}
@@ -158,8 +173,13 @@ function MentionsTypeaheadMenuItem({
       onMouseEnter={onMouseEnter}
       onClick={onClick}
     >
-      {Icon && <Icon size={14} className="smtcmp-popover-item-icon" />}
-      <span className="text">{option.name}</span>
+      <div className="smtcmp-mention-item">
+        <div className="smtcmp-mention-item-main">
+          {Icon && <Icon size={14} className="smtcmp-popover-item-icon" />}
+          <span className="text">{option.name}</span>
+        </div>
+        <div className="smtcmp-mention-item-path">{getDisplayPath()}</div>
+      </div>
     </li>
   )
 }

@@ -1144,3 +1144,25 @@ button.smtcmp-chat-input-model-select {
   height: var(--size-4-4);
   width: var(--size-4-4);
 }
+
+.smtcmp-mention-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-2-1);
+  width: 100%;
+}
+
+.smtcmp-mention-item-main {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+}
+
+.smtcmp-mention-item-path {
+  font-size: var(--font-smallest);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: calc(14px + var(--size-4-2));
+}
