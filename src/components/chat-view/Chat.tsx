@@ -316,6 +316,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
             handleScrollToBottom()
           }
         }
+        activeStreamAbortControllersRef.current = []
       } catch (error) {
         if (error.name === 'AbortError') {
           activeStreamAbortControllersRef.current = []
@@ -324,6 +325,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
           })
           return
         } else {
+          activeStreamAbortControllersRef.current = []
           throw error
         }
       }
@@ -332,6 +334,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
       setQueryProgress({
         type: 'idle',
       })
+      activeStreamAbortControllersRef.current = []
       if (error instanceof LLMAPIKeyNotSetException) {
         openSettingsModalWithError(app, t('chat.errors.apiKeyMissing'))
       } else if (error instanceof LLMAPIKeyInvalidException) {
