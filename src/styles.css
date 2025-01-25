@@ -25,4 +25,96 @@
   border-top: 1px solid var(--background-modifier-border);
   font-size: var(--font-ui-smaller);
   color: var(--text-muted);
+}
+
+/* Apply View Styles */
+#smtcmp-apply-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.smtcmp-diff-line {
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  position: relative;
+  font-family: var(--font-monospace);
+  white-space: pre-wrap;
+}
+
+.smtcmp-diff-line.added {
+  background-color: var(--background-modifier-success);
+}
+
+.smtcmp-diff-line.removed {
+  background-color: var(--background-modifier-error);
+  text-decoration: line-through;
+}
+
+.smtcmp-diff-line-actions {
+  position: absolute;
+  right: 8px;
+  display: none;
+  gap: 8px;
+}
+
+.smtcmp-diff-line:hover .smtcmp-diff-line-actions {
+  display: flex;
+}
+
+.smtcmp-diff-line-actions button {
+  padding: 2px 8px;
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-smaller);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.smtcmp-diff-line-actions button:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.smtcmp-diff-line-actions .smtcmp-accept {
+  color: var(--text-success);
+}
+
+.smtcmp-diff-line-actions .smtcmp-exclude {
+  color: var(--text-error);
+}
+
+.smtcmp-approve-button {
+  color: var(--text-success) !important;
+}
+
+.smtcmp-reject-button {
+  color: var(--text-error) !important;
+}
+
+/* Inline Apply View Styles */
+.smtcmp-inline-apply-view {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  margin: var(--size-4-2) 0;
+}
+
+.smtcmp-inline-apply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.smtcmp-inline-apply-actions {
+  display: flex;
+  gap: var(--size-4-1);
+}
+
+.smtcmp-inline-apply-content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: var(--size-4-2) 0;
 } 
