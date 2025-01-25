@@ -104,6 +104,7 @@ export const en = {
     title: 'Chat',
     newChat: 'New Chat',
     stopGeneration: 'Stop Generation',
+    thinkingProcess: 'Thinking Process',
     errors: {
       apiKeyMissing: 'API key is missing. Please set it in settings menu.',
       apiKeyInvalid: 'API key is invalid. Please update it in settings menu.',

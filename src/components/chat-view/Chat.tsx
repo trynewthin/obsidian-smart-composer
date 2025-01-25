@@ -49,6 +49,7 @@ import { ChatListDropdown } from './ChatListDropdown'
 import QueryProgress, { QueryProgressState } from './QueryProgress'
 import ReactMarkdown from './ReactMarkdown'
 import SimilaritySearchResults from './SimilaritySearchResults'
+import ThinkingContent from './ThinkingContent'
 
 // Add an empty line here
 const getNewInputMessage = (app: App): ChatUserMessage => {
@@ -297,6 +298,7 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
 
         for await (const chunk of stream) {
           const content = chunk.choices[0]?.delta?.content ?? ''
+          const metadata = chunk.choices[0]?.delta?.metadata
           setChatMessages((prevChatHistory) =>
             prevChatHistory.map((message) =>
               message.role === 'assistant' && message.id === responseMessageId
@@ -305,8 +307,9 @@ const Chat = forwardRef<ChatRef, ChatProps>((props, ref) => {
                     content: message.content + content,
                     metadata: {
                       ...message.metadata,
-                      usage: chunk.usage ?? message.metadata?.usage, // Keep existing usage if chunk has no usage data
+                      usage: chunk.usage ?? message.metadata?.usage,
                       model: chatModel,
+                      reasoningContent: metadata?.reasoningContent ?? message.metadata?.reasoningContent,
                     },
                   }
                 : message,
@@ -777,10 +780,19 @@ function ReactMarkdownItem({
     [handleApply, chatMessages, index],
   )
 
+  const message = chatMessages[index]
+  const isReasonerModel = message.metadata?.model?.model?.includes('deepseek-reasoner')
+  const reasoningContent = message.metadata?.reasoningContent
+
   return (
-    <ReactMarkdown onApply={onApply} isApplying={isApplying}>
-      {children}
-    </ReactMarkdown>
+    <>
+      {isReasonerModel && reasoningContent && (
+        <ThinkingContent content={reasoningContent} />
+      )}
+      <ReactMarkdown onApply={onApply} isApplying={isApplying}>
+        {children}
+      </ReactMarkdown>
+    </>
   )
 }
 

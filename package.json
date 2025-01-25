@@ -19,7 +19,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/diff": "^5.2.3",
-    "@types/jest": "^29.5.13",
+    "@types/jest": "^29.5.14",
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.isequal": "^4.5.8",
     "@types/node": "^16.11.6",

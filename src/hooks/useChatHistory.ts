@@ -144,7 +144,7 @@ const serializeChatMessage = (message: ChatMessage): SerializedChatMessage => {
       return {
         role: 'user',
         content: message.content,
-        promptContent: message.promptContent,
+        promptContent: typeof message.promptContent === 'string' ? message.promptContent : null,
         id: message.id,
         mentionables: message.mentionables.map(serializeMentionable),
         similaritySearchResults: message.similaritySearchResults,
@@ -168,7 +168,7 @@ const deserializeChatMessage = (
       return {
         role: 'user',
         content: message.content,
-        promptContent: message.promptContent,
+        promptContent: typeof message.promptContent === 'string' ? message.promptContent : null,
         id: message.id,
         mentionables: message.mentionables
           .map((m) => deserializeMentionable(m, app))

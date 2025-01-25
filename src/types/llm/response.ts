@@ -27,25 +27,36 @@ export type ResponseUsage = {
   total_tokens: number
 }
 
-type NonStreamingChoice = {
-  finish_reason: string | null // Depends on the model. Ex: 'stop' | 'length' | 'content_filter' | 'tool_calls' | 'function_call'
-  message: {
-    content: string | null
-    role: string
+export interface ResponseMessage {
+  content: string | null
+  role?: string
+  reasoning_content?: string | null
+  metadata?: {
+    reasoningContent?: string
+    usage?: ResponseUsage
+    model?: any
   }
+}
+
+export interface ResponseChoice {
+  finish_reason: string | null
+  message?: ResponseMessage
+  delta?: ResponseMessage
+}
+
+type NonStreamingChoice = {
+  finish_reason: string | null
+  message: ResponseMessage
   error?: Error
 }
 
 type StreamingChoice = {
   finish_reason: string | null
-  delta: {
-    content: string | null
-    role?: string
-  }
+  delta: ResponseMessage
   error?: Error
 }
 
 type Error = {
-  code: number // See "Error Handling" section
+  code: number
   message: string
 }

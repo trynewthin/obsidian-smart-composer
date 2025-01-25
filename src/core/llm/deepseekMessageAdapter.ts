@@ -16,6 +16,7 @@ import {
   LLMResponseNonStreaming,
   LLMResponseStreaming,
 } from '../../types/llm/response'
+import { DeepseekChatCompletionChunkDelta } from '../../types/llm/openai'
 
 export class DeepSeekMessageAdapter {
   async generateResponse(
@@ -73,8 +74,33 @@ export class DeepSeekMessageAdapter {
 
     // eslint-disable-next-line no-inner-declarations
     async function* streamResponse(): AsyncIterable<LLMResponseStreaming> {
+      let reasoningContent = ''
+      let isReasoningPhase = true
+
       for await (const chunk of stream) {
-        yield DeepSeekMessageAdapter.parseStreamingResponseChunk(chunk)
+        const response = DeepSeekMessageAdapter.parseStreamingResponseChunk(chunk)
+        const delta = response.choices[0]?.delta
+
+        if (delta?.reasoning_content) {
+          reasoningContent += delta.reasoning_content
+        } else if (delta?.content && isReasoningPhase) {
+          // When we first get content after reasoning, add the reasoning_content to metadata
+          isReasoningPhase = false
+          yield {
+            ...response,
+            choices: response.choices.map(choice => ({
+              ...choice,
+              delta: {
+                ...choice.delta,
+                metadata: {
+                  reasoningContent: reasoningContent
+                }
+              }
+            }))
+          }
+        }
+
+        yield response
       }
     }
 
@@ -173,6 +199,8 @@ export class DeepSeekMessageAdapter {
         message: {
           content: choice.message.content,
           role: choice.message.role,
+          reasoning_content: choice.message.reasoning_content || null,
+          metadata: choice.message.metadata,
         },
       })),
       created: response.created,
@@ -193,6 +221,7 @@ export class DeepSeekMessageAdapter {
         delta: {
           content: choice.delta.content ?? null,
           role: choice.delta.role,
+          ...(choice.delta as DeepseekChatCompletionChunkDelta),
         },
       })),
       created: chunk.created,

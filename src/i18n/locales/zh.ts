@@ -104,6 +104,7 @@ export const zh = {
     title: '聊天',
     newChat: '新建聊天',
     stopGeneration: '停止生成',
+    thinkingProcess: '思考过程',
     errors: {
       apiKeyMissing: 'API 密钥缺失。请在设置菜单中设置。',
       apiKeyInvalid: 'API 密钥无效。请在设置菜单中更新。',

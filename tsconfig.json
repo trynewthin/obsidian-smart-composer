@@ -12,11 +12,13 @@
     "importHelpers": true,
     "isolatedModules": true,
     "strictNullChecks": true,
-    "lib": ["DOM", "ES5", "ES6", "ES7"],
+    "lib": ["DOM", "ES5", "ES6", "ES7", "ES2021"],
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node", "jest"],
+    "typeRoots": ["node_modules/@types", "src/types"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "drizzle.config.ts", "__mocks__"]
 }

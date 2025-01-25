@@ -6,26 +6,35 @@ import { LLMModel } from './llm/model'
 import { ContentPart } from './llm/request'
 import { ResponseUsage } from './llm/response'
 import { Mentionable, SerializedMentionable } from './mentionable'
+import { SimilaritySearchResult } from './rag'
 
-export type ChatUserMessage = {
+export interface ChatMessageMetadata {
+  usage?: {
+    completion_tokens: number
+    prompt_tokens: number
+    total_tokens: number
+  }
+  model?: LLMModel
+  reasoningContent?: string
+}
+
+export interface ChatUserMessage {
   role: 'user'
-  content: SerializedEditorState | null
+  content: any
   promptContent: string | ContentPart[] | null
   id: string
   mentionables: Mentionable[]
-  similaritySearchResults?: (Omit<SelectVector, 'embedding'> & {
-    similarity: number
-  })[]
+  similaritySearchResults?: SimilaritySearchResult[]
+  metadata?: ChatMessageMetadata
 }
-export type ChatAssistantMessage = {
+
+export interface ChatAssistantMessage {
   role: 'assistant'
   content: string
   id: string
-  metadata?: {
-    usage?: ResponseUsage
-    model?: LLMModel
-  }
+  metadata?: ChatMessageMetadata
 }
+
 export type ChatMessage = ChatUserMessage | ChatAssistantMessage
 
 export type SerializedChatUserMessage = {

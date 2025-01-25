@@ -1,4 +1,5 @@
 import { App, TFile, htmlToMarkdown, requestUrl } from 'obsidian'
+import { v4 as uuidv4 } from 'uuid'
 
 import { editorStateToPlainText } from '../components/chat-view/chat-input/utils/editor-state-to-plain-text'
 import { QueryProgressState } from '../components/chat-view/QueryProgress'
@@ -15,6 +16,7 @@ import {
   MentionableVault,
 } from '../types/mentionable'
 import { SmartCopilotSettings } from '../types/settings'
+import { SimilaritySearchResult } from '../types/rag'
 
 import {
   getNestedFiles,
@@ -153,11 +155,9 @@ export class PromptGenerator {
     useVaultSearch?: boolean
     onQueryProgressChange?: (queryProgress: QueryProgressState) => void
   }): Promise<{
-    promptContent: ChatUserMessage['promptContent']
+    promptContent: string | ContentPart[] | null
     shouldUseRAG: boolean
-    similaritySearchResults?: (Omit<SelectVector, 'embedding'> & {
-      similarity: number
-    })[]
+    similaritySearchResults?: SimilaritySearchResult[]
   }> {
     if (!message.content) {
       return {
