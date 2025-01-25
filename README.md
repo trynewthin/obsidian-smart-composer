@@ -4,6 +4,7 @@ This is a fork of [glowingjade/obsidian-smart-composer](https://github.com/glowi
 
 - Added DeepSeek model support (新增 DeepSeek 模型支持)
   - Currently supports chat completion (目前支持对话功能)
+  - Supports displaying thinking process for DeepSeek Reasoner model (支持展示 DeepSeek Reasoner 模型的思考过程)
   - More DeepSeek features coming soon (未来将支持更多 DeepSeek 特性)
 - Added multi-language support (新增多语言支持)
   - Interface available in multiple languages (界面支持多种语言显示)
