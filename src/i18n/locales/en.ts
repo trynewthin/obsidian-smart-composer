@@ -1,101 +1,101 @@
 export const en = {
   settings: {
     language: {
-      title: 'Language',
-      description: 'Choose the language for the interface',
+      title: 'Interface Language',
+      description: 'Choose the display language for the plugin interface',
       options: {
         en: 'English',
         zh: 'Chinese'
       }
     },
     apiKeys: {
-      title: 'API keys',
-      description: 'Enter your API keys for the services you want to use',
+      title: 'API Keys',
+      description: 'Configure API keys for various AI services',
       howToObtain: 'How to obtain API keys',
-      openai: 'OpenAI API key',
-      anthropic: 'Anthropic API key',
-      gemini: 'Gemini API key',
-      groq: 'Groq API key',
-      deepseek: 'DeepSeek API key',
-      placeholder: 'Enter your API key'
+      openai: 'OpenAI API Key',
+      anthropic: 'Anthropic API Key',
+      gemini: 'Gemini API Key',
+      groq: 'Groq API Key',
+      deepseek: 'DeepSeek API Key',
+      placeholder: 'Enter your API key here'
     },
     model: {
-      title: 'Model',
+      title: 'Model Settings',
       chat: {
-        title: 'Chat model',
-        description: 'Choose the model you want to use for chat'
+        title: 'Chat Model',
+        description: 'Select the AI model to use for chat functionality'
       },
       apply: {
-        title: 'Apply model',
-        description: 'Choose the model you want to use for apply'
+        title: 'Apply Model',
+        description: 'Select the AI model to use for applying changes'
       },
       embedding: {
-        title: 'Embedding model',
-        description: 'Choose the model you want to use for embeddings'
+        title: 'Embedding Model',
+        description: 'Select the AI model to use for text embeddings'
       }
     },
     ollama: {
       baseUrl: {
-        title: 'Base URL',
-        description: 'The API endpoint for your Ollama service (e.g., http://127.0.0.1:11434)',
+        title: 'Ollama Service URL',
+        description: 'Set the API endpoint for your Ollama service (e.g., http://127.0.0.1:11434)',
         placeholder: 'http://127.0.0.1:11434'
       },
       model: {
-        title: 'Model Name',
-        description: 'Select a model from your Ollama instance'
+        title: 'Ollama Model',
+        description: 'Select a local model from your Ollama instance'
       }
     },
     openaiCompatible: {
       baseUrl: {
-        title: 'Base URL',
-        description: 'The API endpoint for your OpenAI-compatible service (e.g., https://api.example.com/v1)',
+        title: 'OpenAI Compatible Service URL',
+        description: 'Set the API endpoint for your OpenAI-compatible service (e.g., https://api.example.com/v1)',
         placeholder: 'https://api.example.com/v1'
       },
       apiKey: {
-        title: 'API Key',
-        description: 'Your authentication key for the OpenAI-compatible service',
-        placeholder: 'Enter your API key'
+        title: 'Service Key',
+        description: 'Enter the authentication key for your OpenAI-compatible service',
+        placeholder: 'Enter your service key here'
       },
       model: {
         title: 'Model Name',
-        description: 'The specific model to use with your service (e.g., llama-3.1-70b, mixtral-8x7b)',
+        description: 'Enter the specific model name to use (e.g., llama-3.1-70b, mixtral-8x7b)',
         placeholder: 'llama-3.1-70b'
       }
     },
     systemPrompt: {
-      title: 'System prompt',
-      description: 'This prompt will be added to the beginning of every chat.'
+      title: 'System Prompt',
+      description: 'Set the default system prompt that will be added to the beginning of each chat'
     },
     rag: {
-      title: 'RAG',
+      title: 'Knowledge Retrieval (RAG)',
       includePatterns: {
-        title: 'Include patterns',
-        description: 'If any patterns are specified, ONLY files matching at least one pattern will be included in indexing. One pattern per line. Uses glob patterns (e.g., "notes/*", "*.md"). Leave empty to include all files not excluded by exclude patterns. After changing this, use the command "Rebuild entire vault index" to apply changes.',
-        testButton: 'Test patterns'
+        title: 'Include File Patterns',
+        description: 'Set patterns for files to include in indexing. One per line, using glob format (e.g., "notes/*", "*.md"). Leave empty to include all files not excluded. Requires reindexing after changes.',
+        testButton: 'Test Patterns'
       },
       excludePatterns: {
-        title: 'Exclude patterns',
-        description: 'Files matching ANY of these patterns will be excluded from indexing. One pattern per line. Uses glob patterns (e.g., "private/*", "*.tmp"). Leave empty to exclude nothing. After changing this, use the command "Rebuild entire vault index" to apply changes.',
-        testButton: 'Test patterns'
+        title: 'Exclude File Patterns',
+        description: 'Set patterns for files to exclude from indexing. One per line, using glob format (e.g., "private/*", "*.tmp"). Leave empty to exclude nothing. Requires reindexing after changes.',
+        testButton: 'Test Patterns'
       },
       chunkSize: {
-        title: 'Chunk size',
-        description: 'Set the chunk size for text splitting. After changing this, please re-index the vault using the "Rebuild entire vault index" command.',
+        title: 'Text Chunk Size',
+        description: 'Set the chunk size for text splitting. Requires reindexing after changes.',
         placeholder: '1000'
       },
       thresholdTokens: {
-        title: 'Threshold tokens',
-        description: 'Maximum number of tokens before switching to RAG. If the total tokens from mentioned files exceed this, RAG will be used instead of including all file contents.',
+        title: 'Token Threshold',
+        description: 'Set the token threshold for switching to RAG mode. RAG will be used instead of full content when referenced files exceed this token count.',
         placeholder: '8192'
       },
       minSimilarity: {
-        title: 'Minimum similarity',
-        description: 'Minimum similarity score for RAG results. Higher values return more relevant but potentially fewer results.',
+        title: 'Minimum Similarity',
+        description: 'Set the minimum similarity score for RAG results. Higher values return more relevant but potentially fewer results.',
         placeholder: '0.0'
       },
       limit: {
-        title: 'Limit',
-        description: 'Maximum number of RAG results to include in the prompt. Higher values provide more context but increase token usage.',
+        title: 'Result Limit',
+        description: 'Set the maximum number of RAG results to include in prompts. More results provide more context but increase token usage.',
         placeholder: '10'
       }
     }
