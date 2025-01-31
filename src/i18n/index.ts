@@ -28,9 +28,17 @@ export function t(key: string, lang: Language = 'en', params?: Record<string, st
 }
 
 export function getCurrentLanguage(): Language {
+  /**
+   * 获取当前语言设置
+   * 
+   * 该函数根据浏览器的语言设置返回当前语言。
+   * 如果浏览器语言以 'zh' 开头，则返回 'zh'（中文）；否则返回 'en'（英文）。
+   * 
+   * @returns {Language} 当前语言，可能是 'zh' 或 'en'
+   */
   // 获取系统语言
   const systemLang = navigator.language.toLowerCase()
   
   // 如果是中文，返回 zh，否则返回 en
   return systemLang.startsWith('zh') ? 'zh' : 'en'
-} 
+}

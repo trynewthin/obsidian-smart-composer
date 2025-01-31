@@ -29,7 +29,7 @@ export class ChatView extends ItemView {
   ) {
     super(leaf)
     this.settings = plugin.settings
-    this.initialChatProps = plugin.initialChatProps
+    this.initialChatProps = plugin.viewManager.getInitialChatProps()
   }
 
   getViewType() {
@@ -48,7 +48,7 @@ export class ChatView extends ItemView {
     await this.render()
 
     // Consume chatProps
-    this.initialChatProps = undefined
+    this.plugin.viewManager.setInitialChatProps(undefined)
   }
 
   async onClose() {

@@ -1,9 +1,4 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian'
-
-import { ApplyView } from './ApplyView'
-import { ChatView } from './ChatView'
-import { ChatProps } from './components/chat-view/Chat'
-import { APPLY_VIEW_TYPE, CHAT_VIEW_TYPE } from './constants'
 import { RAGEngine } from './core/rag/ragEngine'
 import { DatabaseManager } from './database/DatabaseManager'
 import { SmartCopilotSettingTab } from './settings/SettingTab'
@@ -11,238 +6,109 @@ import {
   SmartCopilotSettings,
   parseSmartCopilotSettings,
 } from './types/settings'
-import { getMentionableBlockData } from './utils/obsidian'
-import { Language, t as translate } from './i18n'
+import { Language } from './i18n'
+import { LanguageService } from './service/language_service'
+import { ViewManager } from './service/view_manager'
+import { CommandManager } from './service/command_manager'
+import { SettingsManager } from './service/settings_manager'
+import { DatabaseService } from './service/database_service'
+import { RAGService } from './service/rag_service'
 
-// Remember to rename these classes and interfaces!
-export default class SmartCopilotPlugin extends Plugin {
-  settings: SmartCopilotSettings
-  initialChatProps?: ChatProps // TODO: change this to use view state like ApplyView
-  settingsChangeListeners: ((newSettings: SmartCopilotSettings) => void)[] = []
-  dbManager: DatabaseManager | null = null
-  ragEngine: RAGEngine | null = null
-  private dbManagerInitPromise: Promise<DatabaseManager> | null = null
-  private ragEngineInitPromise: Promise<RAGEngine> | null = null
-  private language: Language = 'en'
+/**
+ * SmartAssistant 插件的主类
+ */
+export default class SmartAssistant extends Plugin {
+  /** 设置管理器实例 */
+  settingsManager: SettingsManager
 
-  t(key: string, params?: Record<string, string>): string {
-    return translate(key, this.language, params)
+  /** 数据库服务实例 */
+  databaseService: DatabaseService
+
+  /** RAG 服务实例 */
+  ragService: RAGService
+
+  /** 语言服务实例 */
+  languageService: LanguageService
+
+  /** 视图管理器实例 */
+  viewManager: ViewManager
+
+  /** 命令管理器实例 */
+  commandManager: CommandManager
+
+  /**
+   * 获取当前设置
+   */
+  get settings(): SmartCopilotSettings {
+    return this.settingsManager.getSettings()
   }
 
-  setLanguage(lang: Language) {
-    this.language = lang
-    this.settings.language = lang
-    this.saveData(this.settings)
+  /**
+   * 翻译指定的键值
+   */
+  t(key: string, params?: Record<string, string>): string {
+    return this.languageService.translate(key, params)
+  }
+
+  /**
+   * 设置插件语言
+   */
+  async setLanguage(lang: Language) {
+    await this.languageService.setLanguage(lang)
   }
 
   async onload() {
-    await this.loadSettings()
+    // 初始化设置管理器
+    this.settingsManager = new SettingsManager(this.app, this)
+    await this.settingsManager.loadSettings()
 
-    this.registerView(CHAT_VIEW_TYPE, (leaf) => new ChatView(leaf, this))
-    this.registerView(APPLY_VIEW_TYPE, (leaf) => new ApplyView(leaf, this))
+    // 初始化数据库服务
+    this.databaseService = new DatabaseService(this.app, this)
 
-    // This creates an icon in the left ribbon.
-    this.addRibbonIcon('wand-sparkles', 'Open smart composer', () =>
-      this.openChatView(),
+    // 初始化 RAG 服务
+    this.ragService = new RAGService(this.app, this, this.databaseService)
+
+    // 初始化语言服务
+    this.languageService = new LanguageService(
+      this.app,
+      this.settings,
+      async (settings) => await this.settingsManager.saveSettings(settings)
     )
 
-    // This adds a simple command that can be triggered anywhere
-    this.addCommand({
-      id: 'open-new-chat',
-      name: 'Open chat',
-      callback: () => this.openChatView(true),
-    })
+    // 初始化视图管理器
+    this.viewManager = new ViewManager(this.app, this)
+    this.viewManager.registerViews()
 
-    this.addCommand({
-      id: 'add-selection-to-chat',
-      name: 'Add selection to chat',
-      editorCallback: (editor: Editor, view: MarkdownView) => {
-        this.addSelectionToChat(editor, view)
-      },
-    })
+    // 初始化命令管理器
+    this.commandManager = new CommandManager(this.app, this, this.viewManager)
+    this.commandManager.registerCommands()
+    this.commandManager.addRibbonIcon()
 
-    this.addCommand({
-      id: 'rebuild-vault-index',
-      name: 'Rebuild entire vault index',
-      callback: async () => {
-        const notice = new Notice('Rebuilding vault index...', 0)
-        try {
-          const ragEngine = await this.getRAGEngine()
-          await ragEngine.updateVaultIndex(
-            { reindexAll: true },
-            (queryProgress) => {
-              if (queryProgress.type === 'indexing') {
-                const { completedChunks, totalChunks } =
-                  queryProgress.indexProgress
-                notice.setMessage(
-                  `Indexing chunks: ${completedChunks} / ${totalChunks}`,
-                )
-              }
-            },
-          )
-          notice.setMessage('Rebuilding vault index complete')
-        } catch (error) {
-          console.error(error)
-          notice.setMessage('Rebuilding vault index failed')
-        } finally {
-          setTimeout(() => {
-            notice.hide()
-          }, 1000)
-        }
-      },
-    })
-
-    this.addCommand({
-      id: 'update-vault-index',
-      name: 'Update index for modified files',
-      callback: async () => {
-        const notice = new Notice('Updating vault index...', 0)
-        try {
-          const ragEngine = await this.getRAGEngine()
-          await ragEngine.updateVaultIndex(
-            { reindexAll: false },
-            (queryProgress) => {
-              if (queryProgress.type === 'indexing') {
-                const { completedChunks, totalChunks } =
-                  queryProgress.indexProgress
-                notice.setMessage(
-                  `Indexing chunks: ${completedChunks} / ${totalChunks}`,
-                )
-              }
-            },
-          )
-          notice.setMessage('Vault index updated')
-        } catch (error) {
-          console.error(error)
-          notice.setMessage('Vault index update failed')
-        } finally {
-          setTimeout(() => {
-            notice.hide()
-          }, 1000)
-        }
-      },
-    })
-
-    // This adds a settings tab so the user can configure various aspects of the plugin
+    // 添加设置标签页
     this.addSettingTab(new SmartCopilotSettingTab(this.app, this))
   }
 
   onunload() {
-    this.dbManager?.cleanup()
-    this.dbManager = null
-  }
-
-  async loadSettings() {
-    this.settings = parseSmartCopilotSettings(await this.loadData())
-    this.language = this.settings.language
-    await this.saveData(this.settings) // Save updated settings
+    this.databaseService.cleanup()
   }
 
   async setSettings(newSettings: SmartCopilotSettings) {
-    this.settings = newSettings
-    this.language = newSettings.language
-    await this.saveData(newSettings)
-    this.ragEngine?.setSettings(newSettings)
-    this.settingsChangeListeners.forEach((listener) => listener(newSettings))
+    await this.settingsManager.updateSettings(newSettings)
+    await this.languageService.setLanguage(newSettings.language)
+    await this.ragService.updateSettings(newSettings)
   }
 
   addSettingsChangeListener(
     listener: (newSettings: SmartCopilotSettings) => void,
   ) {
-    this.settingsChangeListeners.push(listener)
-    return () => {
-      this.settingsChangeListeners = this.settingsChangeListeners.filter(
-        (l) => l !== listener,
-      )
-    }
-  }
-
-  async openChatView(openNewChat = false) {
-    const view = this.app.workspace.getActiveViewOfType(MarkdownView)
-    const editor = view?.editor
-    if (!view || !editor) {
-      this.activateChatView(undefined, openNewChat)
-      return
-    }
-    const selectedBlockData = await getMentionableBlockData(editor, view)
-    this.activateChatView(
-      {
-        selectedBlock: selectedBlockData ?? undefined,
-      },
-      openNewChat,
-    )
-  }
-
-  async activateChatView(chatProps?: ChatProps, openNewChat = false) {
-    // chatProps is consumed in ChatView.tsx
-    this.initialChatProps = chatProps
-
-    const leaf = this.app.workspace.getLeavesOfType(CHAT_VIEW_TYPE)[0]
-
-    await (leaf ?? this.app.workspace.getRightLeaf(false))?.setViewState({
-      type: CHAT_VIEW_TYPE,
-      active: true,
-    })
-
-    if (openNewChat && leaf && leaf.view instanceof ChatView) {
-      leaf.view.openNewChat(chatProps?.selectedBlock)
-    }
-
-    this.app.workspace.revealLeaf(
-      this.app.workspace.getLeavesOfType(CHAT_VIEW_TYPE)[0],
-    )
-  }
-
-  async addSelectionToChat(editor: Editor, view: MarkdownView) {
-    const data = await getMentionableBlockData(editor, view)
-    if (!data) return
-
-    const leaves = this.app.workspace.getLeavesOfType(CHAT_VIEW_TYPE)
-    if (leaves.length === 0 || !(leaves[0].view instanceof ChatView)) {
-      await this.activateChatView({
-        selectedBlock: data,
-      })
-      return
-    }
-
-    // bring leaf to foreground (uncollapse sidebar if it's collapsed)
-    await this.app.workspace.revealLeaf(leaves[0])
-
-    const chatView = leaves[0].view
-    chatView.addSelectionToChat(data)
-    chatView.focusMessage()
+    return this.settingsManager.addSettingsChangeListener(listener)
   }
 
   async getDbManager(): Promise<DatabaseManager> {
-    if (this.dbManager) {
-      return this.dbManager
-    }
-
-    if (!this.dbManagerInitPromise) {
-      this.dbManagerInitPromise = (async () => {
-        this.dbManager = await DatabaseManager.create(this.app)
-        return this.dbManager
-      })()
-    }
-
-    // if initialization is running, wait for it to complete instead of creating a new initialization promise
-    return this.dbManagerInitPromise
+    return this.databaseService.getDbManager()
   }
 
   async getRAGEngine(): Promise<RAGEngine> {
-    if (this.ragEngine) {
-      return this.ragEngine
-    }
-
-    if (!this.ragEngineInitPromise) {
-      this.ragEngineInitPromise = (async () => {
-        const dbManager = await this.getDbManager()
-        this.ragEngine = new RAGEngine(this.app, this.settings, dbManager)
-        return this.ragEngine
-      })()
-    }
-
-    // if initialization is running, wait for it to complete instead of creating a new initialization promise
-    return this.ragEngineInitPromise
+    return this.ragService.getRAGEngine()
   }
 }
