@@ -1,9 +1,9 @@
-import { EmbeddingModelOption } from './types/embedding'
-import { ModelOption } from './types/llm/model'
+import { ModelOption } from '../types/llm/model'
+import { EmbeddingModelOption } from '../types/embedding'
 
-export const CHAT_VIEW_TYPE = 'smtcmp-chat-view'
-export const APPLY_VIEW_TYPE = 'smtcmp-apply-view'
-
+/**
+ * Chat model options available in the plugin
+ */
 export const CHAT_MODEL_OPTIONS: ModelOption[] = [
   {
     id: 'anthropic/claude-3.5-sonnet-latest',
@@ -11,6 +11,7 @@ export const CHAT_MODEL_OPTIONS: ModelOption[] = [
     model: {
       provider: 'anthropic',
       model: 'claude-3-5-sonnet-latest',
+      baseURL: 'https://api.anthropic.com/v1',
     },
   },
   {
@@ -79,6 +80,16 @@ export const CHAT_MODEL_OPTIONS: ModelOption[] = [
     },
   },
   {
+    id: 'llmstudio/local',
+    name: 'LM Studio (Local)',
+    model: {
+      provider: 'openai-compatible',
+      model: 'local-model',
+      apiKey: 'not-needed',
+      baseURL: 'http://localhost:6666/v1',
+    },
+  },
+  {
     id: 'openai-compatible',
     name: 'Custom (OpenAI Compatible)',
     model: {
@@ -106,6 +117,9 @@ export const CHAT_MODEL_OPTIONS: ModelOption[] = [
   },
 ]
 
+/**
+ * Apply model options available in the plugin
+ */
 export const APPLY_MODEL_OPTIONS: ModelOption[] = [
   {
     id: 'openai/gpt-4o-mini',
@@ -184,7 +198,9 @@ export const APPLY_MODEL_OPTIONS: ModelOption[] = [
   },
 ]
 
-// Update table exports in src/database/schema.ts when updating this
+/**
+ * Embedding model options available in the plugin
+ */
 export const EMBEDDING_MODEL_OPTIONS: EmbeddingModelOption[] = [
   {
     id: 'openai/text-embedding-3-small',
@@ -244,37 +260,3 @@ export const EMBEDDING_MODEL_OPTIONS: EmbeddingModelOption[] = [
     dimension: 1024,
   },
 ]
-
-// Pricing in dollars per million tokens
-type ModelPricing = {
-  input: number
-  output: number
-}
-
-export const OPENAI_PRICES: Record<string, ModelPricing> = {
-  'gpt-4o': { input: 2.5, output: 10 },
-  'gpt-4o-mini': { input: 0.15, output: 0.6 },
-}
-
-export const ANTHROPIC_PRICES: Record<string, ModelPricing> = {
-  'claude-3-5-sonnet-latest': { input: 3, output: 15 },
-  'claude-3-5-haiku-latest': { input: 1, output: 5 },
-}
-
-// Gemini is currently free for low rate limits
-export const GEMINI_PRICES: Record<string, ModelPricing> = {
-  'gemini-1.5-pro': { input: 0, output: 0 },
-  'gemini-1.5-flash': { input: 0, output: 0 },
-}
-
-export const GROQ_PRICES: Record<string, ModelPricing> = {
-  'llama-3.1-70b-versatile': { input: 0.59, output: 0.79 },
-  'llama-3.1-8b-instant': { input: 0.05, output: 0.08 },
-}
-
-export const PGLITE_DB_PATH = '.smtcmp_vector_db.tar.gz'
-
-export const DEEPSEEK_PRICES: Record<string, ModelPricing> = {
-  'deepseek-chat': { input: 0.2, output: 0.8 },
-  'deepseek-reasoner': { input: 0.4, output: 1.6 },
-}

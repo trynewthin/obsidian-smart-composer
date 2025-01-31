@@ -15,6 +15,10 @@ import { BaseLLMProvider } from './base'
 import { LLMBaseUrlNotSetException, LLMModelNotSetException } from './exception'
 import { OpenAIMessageAdapter } from './openaiMessageAdapter'
 
+/**
+ * Provider implementation for OpenAI-compatible APIs
+ * Handles both streaming and non-streaming requests to OpenAI-compatible endpoints
+ */
 export class OpenAICompatibleProvider implements BaseLLMProvider {
   private adapter: OpenAIMessageAdapter
 
